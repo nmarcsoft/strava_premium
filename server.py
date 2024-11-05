@@ -1,3 +1,5 @@
+#!/home/nicolas/Documents/perso/strava_prenium/.venv/bin/python
+
 import requests
 from pprint import pprint
 from flask import Flask, request, redirect, jsonify
@@ -31,7 +33,7 @@ def callback():
 
     access_token = get_access_token(auth_code)
     if access_token:
-        create_activity(access_token)
+        get_activity(access_token)
         return "Activity created successfully! Check your Strava account."
     else:
         return "Failed to retrieve access token", 500
@@ -51,28 +53,20 @@ def get_access_token(auth_code):
     access_token = response.json().get("access_token")
     return access_token
 
-def create_activity(access_token):
-    url = "https://www.strava.com/api/v3/activities"
+
+def get_activity(access_token):
+    print(access_token)
+    activity_id = 12805308059  # Replace with your actual activity ID
+    url = f"https://www.strava.com/api/v3/activities/{activity_id}"  # Specify activity ID in the URL
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
 
-    activity_data = {
-        "name": "Sample Activity",
-        "sport_type": "Run",
-        "start_date_local": "2013-10-20T19:20:30+01:00",
-        "elapsed_time": 56,
-        "type": "Run",
-        "description": "Morning run",
-        "distance": 3400,
-        "trainer": 1,
-        "commute": 1
-    }
-
     try:
-        response = requests.post(url, headers=headers, json=activity_data)
+        # Fetch the activity data without `json=activity_data` since it's a GET request
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
-        pprint(response.json())
+        pprint(response.json())  # Display the activity details
     except requests.exceptions.HTTPError as err:
         print(f"HTTP error occurred: {err}")
     except Exception as e:
